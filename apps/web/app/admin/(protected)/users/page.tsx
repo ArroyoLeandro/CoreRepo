@@ -1,21 +1,15 @@
-import { cookies } from "next/headers";
-import { createServerApi } from "../../../../lib/api";
-import { getMessages, resolveLocale } from "../../../../lib/i18n";
-import { UsersClient } from "./users-client";
+import { UsersList } from "@/features/users";
+import { createServerApi } from "@/shared/lib/api";
+import { getMessages, resolveLocale } from "@/shared/lib/i18n";
+import { getRequestCookieHeader } from "@/shared/lib/request-cookies";
 
 export default async function AdminUsersPage() {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((entry) => `${entry.name}=${entry.value}`)
-    .join("; ");
-
-  const api = createServerApi(cookieHeader);
+  const api = createServerApi(await getRequestCookieHeader());
   const [list, settings] = await Promise.all([
     api.listUsers(),
     api.getSettings(),
   ]);
   const t = getMessages(resolveLocale(settings.locale));
 
-  return <UsersClient initialUsers={list.users} labels={t.users} />;
+  return <UsersList initialUsers={list.users} labels={t.users} />;
 }

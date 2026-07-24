@@ -1,18 +1,12 @@
-import { cookies } from "next/headers";
-import { createServerApi } from "../../../../../lib/api";
-import { getMessages, resolveLocale } from "../../../../../lib/i18n";
-import { UserFormClient } from "../user-form-client";
+import { UserForm } from "@/features/users";
+import { createServerApi } from "@/shared/lib/api";
+import { getMessages, resolveLocale } from "@/shared/lib/i18n";
+import { getRequestCookieHeader } from "@/shared/lib/request-cookies";
 
 export default async function AdminCreateUserPage() {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((entry) => `${entry.name}=${entry.value}`)
-    .join("; ");
-
-  const api = createServerApi(cookieHeader);
+  const api = createServerApi(await getRequestCookieHeader());
   const settings = await api.getSettings();
   const t = getMessages(resolveLocale(settings.locale));
 
-  return <UserFormClient mode="create" labels={t.users} />;
+  return <UserForm mode="create" labels={t.users} />;
 }

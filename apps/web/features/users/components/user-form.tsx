@@ -1,16 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
-import { PageShell } from "../../../../components/dashboard/PageShell";
-import { Button, Field, TextInput } from "../../../../components/ui/form-controls";
-import { createBrowserApi } from "../../../../lib/api";
-import type { Messages } from "../../../../lib/i18n";
-
-type UserRow = Awaited<
-  ReturnType<ReturnType<typeof createBrowserApi>["listUsers"]>
->["users"][number];
+import type { Messages } from "@/shared/lib/i18n";
+import { PageShell } from "@/shared/layout/page-shell";
+import { Button, Field, TextInput } from "@/shared/ui/form-controls";
+import { useUserForm } from "../hooks/use-user-form";
+import type { UserRow } from "../types";
 
 type Props = {
   mode: "create" | "edit";
@@ -18,45 +13,8 @@ type Props = {
   labels: Messages["users"];
 };
 
-export function UserFormClient({ mode, initialUser, labels }: Props) {
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
-
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError(null);
-    setPending(true);
-    const form = new FormData(event.currentTarget);
-    const name = String(form.get("name") ?? "");
-    const email = String(form.get("email") ?? "");
-    const password = String(form.get("password") ?? "");
-    const role = (String(form.get("role") ?? "user") as "admin" | "user") || "user";
-
-    try {
-      const api = createBrowserApi();
-      if (mode === "create") {
-        await api.createUser({ name, email, password, role });
-      } else if (initialUser) {
-        const patch: {
-          name?: string;
-          email?: string;
-          password?: string;
-          role?: "admin" | "user";
-        } = { name, email, role };
-        if (password.trim().length > 0) {
-          patch.password = password;
-        }
-        await api.updateUser(initialUser.id, patch);
-      }
-      router.replace("/admin/users");
-      router.refresh();
-    } catch {
-      setError(mode === "create" ? "Could not create user." : "Could not update user.");
-    } finally {
-      setPending(false);
-    }
-  }
+export function UserForm({ mode, initialUser, labels }: Props) {
+  const { error, pending, submit } = useUserForm(mode, initialUser);
 
   return (
     <PageShell
@@ -66,7 +24,7 @@ export function UserFormClient({ mode, initialUser, labels }: Props) {
     >
       <div className="grid min-h-full lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)]">
         <form
-          onSubmit={onSubmit}
+          onSubmit={submit}
           className="flex flex-col gap-3 border-b border-line p-4 lg:border-r lg:border-b-0"
         >
           <div className="grid gap-3 sm:grid-cols-2">

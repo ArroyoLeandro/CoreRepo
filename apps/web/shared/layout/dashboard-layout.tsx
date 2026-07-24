@@ -1,10 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Header } from "./Header";
-import { MainContent } from "./MainContent";
-import { Sidebar, type SidebarUser } from "./Sidebar";
+import { Header } from "./header";
+import { MainContent } from "./main-content";
 import { ShellProvider } from "./shell-context";
+import { Sidebar, type SidebarUser } from "./sidebar";
 
 type Props = {
   brand: string;

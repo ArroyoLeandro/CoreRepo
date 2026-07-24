@@ -1,79 +1,47 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { PageShell } from "../../../../components/dashboard/PageShell";
-import { createBrowserApi } from "../../../../lib/api";
-import type { Messages } from "../../../../lib/i18n";
-
-type Settings = Awaited<
-  ReturnType<ReturnType<typeof createBrowserApi>["getSettings"]>
->;
+import type { Messages } from "@/shared/lib/i18n";
+import { PageShell } from "@/shared/layout/page-shell";
+import { useSettings, type Settings } from "../hooks/use-settings";
 
 type Props = {
   initialSettings: Settings;
   messages: Messages["settings"];
 };
 
-export function SettingsClient({ initialSettings, messages }: Props) {
-  const router = useRouter();
-  const [settings, setSettings] = useState(initialSettings);
-  const [workspaceName, setWorkspaceName] = useState("CoreRepo HQ");
-  const [timezone, setTimezone] = useState("America/Argentina/Buenos_Aires");
-  const [emailDigest, setEmailDigest] = useState(true);
-  const [productUpdates, setProductUpdates] = useState(false);
-  const [securityAlerts, setSecurityAlerts] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+function toggleClass(active: boolean) {
+  return [
+    "inline-flex h-9 items-center justify-center px-3 text-sm font-medium disabled:opacity-50",
+    active
+      ? "bg-accent text-accent-fg"
+      : "border border-line bg-surface text-foreground hover:bg-canvas",
+  ].join(" ");
+}
 
-  async function persist(next: Partial<Settings>) {
-    setError(null);
-    setStatus(null);
-    setPending(true);
-    try {
-      const api = createBrowserApi();
-      const saved = await api.updateSettings(next);
-      setSettings(saved);
-      setStatus(messages.saved);
-      router.refresh();
-    } catch {
-      setError(messages.saveError);
-    } finally {
-      setPending(false);
-    }
-  }
+function CheckRow({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <label className="flex items-center justify-between gap-3 border border-line bg-surface px-3 py-2 text-sm">
+      <span>{label}</span>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="size-4 accent-[var(--accent)]"
+      />
+    </label>
+  );
+}
 
-  function toggleClass(active: boolean) {
-    return [
-      "inline-flex h-9 items-center justify-center px-3 text-sm font-medium disabled:opacity-50",
-      active
-        ? "bg-accent text-accent-fg"
-        : "border border-line bg-surface text-foreground hover:bg-canvas",
-    ].join(" ");
-  }
-
-  function CheckRow({
-    label,
-    checked,
-    onChange,
-  }: {
-    label: string;
-    checked: boolean;
-    onChange: (value: boolean) => void;
-  }) {
-    return (
-      <label className="flex items-center justify-between gap-3 border border-line bg-surface px-3 py-2 text-sm">
-        <span>{label}</span>
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={(e) => onChange(e.target.checked)}
-          className="size-4 accent-[var(--accent)]"
-        />
-      </label>
-    );
-  }
+export function SettingsPanel({ initialSettings, messages }: Props) {
+  const s = useSettings(initialSettings, messages);
 
   return (
     <PageShell
@@ -98,25 +66,25 @@ export function SettingsClient({ initialSettings, messages }: Props) {
               >
                 <button
                   type="button"
-                  className={toggleClass(settings.locale === "es")}
-                  disabled={pending || settings.locale === "es"}
+                  className={toggleClass(s.settings.locale === "es")}
+                  disabled={s.pending || s.settings.locale === "es"}
                   data-testid="locale-es"
-                  onClick={() => void persist({ locale: "es" })}
+                  onClick={() => void s.persist({ locale: "es" })}
                 >
                   {messages.localeEs}
                 </button>
                 <button
                   type="button"
-                  className={toggleClass(settings.locale === "en")}
-                  disabled={pending || settings.locale === "en"}
+                  className={toggleClass(s.settings.locale === "en")}
+                  disabled={s.pending || s.settings.locale === "en"}
                   data-testid="locale-en"
-                  onClick={() => void persist({ locale: "en" })}
+                  onClick={() => void s.persist({ locale: "en" })}
                 >
                   {messages.localeEn}
                 </button>
               </div>
               <span data-testid="settings-locale" className="sr-only">
-                {settings.locale}
+                {s.settings.locale}
               </span>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -128,25 +96,25 @@ export function SettingsClient({ initialSettings, messages }: Props) {
               >
                 <button
                   type="button"
-                  className={toggleClass(settings.theme === "light")}
-                  disabled={pending || settings.theme === "light"}
+                  className={toggleClass(s.settings.theme === "light")}
+                  disabled={s.pending || s.settings.theme === "light"}
                   data-testid="theme-light"
-                  onClick={() => void persist({ theme: "light" })}
+                  onClick={() => void s.persist({ theme: "light" })}
                 >
                   {messages.themeLight}
                 </button>
                 <button
                   type="button"
-                  className={toggleClass(settings.theme === "dark")}
-                  disabled={pending || settings.theme === "dark"}
+                  className={toggleClass(s.settings.theme === "dark")}
+                  disabled={s.pending || s.settings.theme === "dark"}
                   data-testid="theme-dark"
-                  onClick={() => void persist({ theme: "dark" })}
+                  onClick={() => void s.persist({ theme: "dark" })}
                 >
                   {messages.themeDark}
                 </button>
               </div>
               <span data-testid="settings-theme" className="sr-only">
-                {settings.theme}
+                {s.settings.theme}
               </span>
             </div>
           </div>
@@ -162,8 +130,8 @@ export function SettingsClient({ initialSettings, messages }: Props) {
                 {messages.workspaceName}
               </span>
               <input
-                value={workspaceName}
-                onChange={(e) => setWorkspaceName(e.target.value)}
+                value={s.workspaceName}
+                onChange={(e) => s.setWorkspaceName(e.target.value)}
                 className="h-9 border border-line bg-surface-elevated px-3 outline-none focus:border-accent"
               />
             </label>
@@ -172,8 +140,8 @@ export function SettingsClient({ initialSettings, messages }: Props) {
                 {messages.timezone}
               </span>
               <select
-                value={timezone}
-                onChange={(e) => setTimezone(e.target.value)}
+                value={s.timezone}
+                onChange={(e) => s.setTimezone(e.target.value)}
                 className="h-9 border border-line bg-surface-elevated px-3 outline-none focus:border-accent"
               >
                 <option value="America/Argentina/Buenos_Aires">
@@ -196,26 +164,26 @@ export function SettingsClient({ initialSettings, messages }: Props) {
         <div className="grid gap-2 md:grid-cols-3">
           <CheckRow
             label={messages.emailDigest}
-            checked={emailDigest}
-            onChange={setEmailDigest}
+            checked={s.emailDigest}
+            onChange={s.setEmailDigest}
           />
           <CheckRow
             label={messages.productUpdates}
-            checked={productUpdates}
-            onChange={setProductUpdates}
+            checked={s.productUpdates}
+            onChange={s.setProductUpdates}
           />
           <CheckRow
             label={messages.securityAlerts}
-            checked={securityAlerts}
-            onChange={setSecurityAlerts}
+            checked={s.securityAlerts}
+            onChange={s.setSecurityAlerts}
           />
         </div>
       </section>
 
-      {error ? <p className="text-sm text-danger">{error}</p> : null}
-      {status ? (
+      {s.error ? <p className="text-sm text-danger">{s.error}</p> : null}
+      {s.status ? (
         <p className="text-sm text-muted" data-testid="settings-status">
-          {status}
+          {s.status}
         </p>
       ) : null}
     </PageShell>

@@ -3,7 +3,7 @@
 import { Bell, Menu, Search, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { AdminBreadcrumbs } from "./AdminBreadcrumbs";
+import { AdminBreadcrumbs } from "./admin-breadcrumbs";
 import { useShell } from "./shell-context";
 
 type Props = {

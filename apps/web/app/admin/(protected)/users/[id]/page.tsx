@@ -1,8 +1,8 @@
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { createServerApi } from "../../../../../lib/api";
-import { getMessages, resolveLocale } from "../../../../../lib/i18n";
-import { UserFormClient } from "../user-form-client";
+import { UserForm } from "@/features/users";
+import { createServerApi } from "@/shared/lib/api";
+import { getMessages, resolveLocale } from "@/shared/lib/i18n";
+import { getRequestCookieHeader } from "@/shared/lib/request-cookies";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -10,21 +10,13 @@ type Props = {
 
 export default async function AdminEditUserPage({ params }: Props) {
   const { id } = await params;
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((entry) => `${entry.name}=${entry.value}`)
-    .join("; ");
-
-  const api = createServerApi(cookieHeader);
+  const api = createServerApi(await getRequestCookieHeader());
   const settings = await api.getSettings();
   const t = getMessages(resolveLocale(settings.locale));
 
   try {
     const user = await api.getUser(id);
-    return (
-      <UserFormClient mode="edit" initialUser={user} labels={t.users} />
-    );
+    return <UserForm mode="edit" initialUser={user} labels={t.users} />;
   } catch {
     notFound();
   }
