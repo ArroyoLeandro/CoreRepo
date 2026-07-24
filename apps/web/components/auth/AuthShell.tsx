@@ -39,7 +39,7 @@ export function AuthShell({
             className="pointer-events-none absolute inset-0 opacity-90"
             style={{
               background:
-                "linear-gradient(165deg, var(--palette-3) 0%, var(--palette-1) 48%, var(--palette-0) 100%)",
+                "linear-gradient(165deg, var(--palette-4) 0%, var(--palette-1) 52%, var(--palette-0) 100%)",
             }}
           />
           <div
@@ -56,22 +56,22 @@ export function AuthShell({
               <span
                 className="inline-flex size-6 items-center justify-center border font-mono text-[10px]"
                 style={{
-                  color: "var(--palette-5)",
-                  borderColor: "color-mix(in srgb, var(--palette-5) 40%, transparent)",
+                  color: "var(--palette-3)",
+                  borderColor: "color-mix(in srgb, var(--palette-3) 40%, transparent)",
                 }}
               >
                 ●
               </span>
               <span
                 className="text-sm font-semibold tracking-tight"
-                style={{ color: "var(--palette-5)" }}
+                style={{ color: "var(--palette-3)" }}
               >
                 {brand}
               </span>
             </div>
             <h1
               className="max-w-sm text-3xl font-semibold tracking-tight"
-              style={{ color: "var(--palette-5)" }}
+              style={{ color: "var(--palette-3)" }}
             >
               {panelTitle}
             </h1>
@@ -79,7 +79,7 @@ export function AuthShell({
               className="mt-3 max-w-sm text-sm"
               style={{
                 color:
-                  "color-mix(in srgb, var(--palette-5) 72%, transparent)",
+                  "color-mix(in srgb, var(--palette-3) 72%, transparent)",
               }}
             >
               {panelSubtitle}
@@ -101,7 +101,7 @@ export function AuthShell({
                     : {
                         backgroundColor: "rgb(0 0 0 / 0.25)",
                         color:
-                          "color-mix(in srgb, var(--palette-5) 75%, transparent)",
+                          "color-mix(in srgb, var(--palette-3) 75%, transparent)",
                         borderColor: "rgb(255 255 255 / 0.15)",
                       }
                 }

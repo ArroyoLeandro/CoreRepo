@@ -11,16 +11,30 @@ type Props = {
   user: SidebarUser;
   theme: "light" | "dark";
   locale: string;
-  breadcrumbs: string[];
   searchPlaceholder: string;
   sidebarLabels: {
     general: string;
     dashboard: string;
     users: string;
+    usersList: string;
+    usersCreate: string;
     settings: string;
     account: string;
+    profile: string;
     logout: string;
   };
+  crumbLabels: Record<string, string>;
+  notificationLabels: {
+    title: string;
+    empty: string;
+    markAll: string;
+  };
+  notifications: Array<{
+    id: string;
+    title: string;
+    time: string;
+    unread?: boolean;
+  }>;
   children: ReactNode;
 };
 
@@ -29,9 +43,11 @@ export function DashboardLayout({
   user,
   theme,
   locale,
-  breadcrumbs,
   searchPlaceholder,
   sidebarLabels,
+  crumbLabels,
+  notificationLabels,
+  notifications,
   children,
 }: Props) {
   return (
@@ -45,9 +61,11 @@ export function DashboardLayout({
         <Sidebar brand={brand} user={user} labels={sidebarLabels} />
         <div className="flex min-w-0 flex-1 flex-col">
           <Header
-            breadcrumbs={breadcrumbs}
             searchPlaceholder={searchPlaceholder}
             userName={user.name}
+            crumbLabels={crumbLabels}
+            notificationLabels={notificationLabels}
+            notifications={notifications}
           />
           <MainContent>{children}</MainContent>
         </div>

@@ -4,30 +4,47 @@
     "general": "General",
     "dashboard": "Dashboard",
     "users": "Usuarios",
+    "usersList": "Listado",
+    "usersCreate": "Crear",
     "settings": "Configuración",
     "account": "Cuenta",
+    "profile": "Perfil",
     "login": "Iniciar sesión",
     "logout": "Salir"
   },
   "header": {
     "search": "Buscar…",
-    "pages": "Pages"
+    "pages": "Admin",
+    "notifications": "Notificaciones",
+    "notificationsEmpty": "Sin notificaciones",
+    "markAllRead": "Marcar leídas"
+  },
+  "crumbs": {
+    "admin": "Admin",
+    "/admin": "Dashboard",
+    "/admin/users": "Usuarios",
+    "/admin/users/new": "Crear usuario",
+    "/admin/settings": "Configuración",
+    "/admin/profile": "Perfil",
+    "editUser": "Editar"
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Resumen del template admin.",
+    "subtitle": "Resumen operativo del template.",
     "metrics": {
       "users": "Usuarios",
-      "sessions": "Sesiones",
-      "locale": "Idioma",
-      "theme": "Tema"
+      "revenue": "Ingresos",
+      "orders": "Órdenes",
+      "conversion": "Conversión"
     },
-    "tableTitle": "Actividad reciente",
+    "chartSales": "Ventas (30 días)",
+    "chartTraffic": "Tráfico",
+    "tableTitle": "Últimas órdenes",
     "tableEmpty": "Sin filas todavía — espacio listo para datos."
   },
   "settings": {
     "title": "Configuración",
-    "description": "Preferencias de idioma y tema. Los cambios se guardan en el servidor.",
+    "description": "Preferencias del workspace, apariencia y notificaciones.",
     "locale": "Idioma",
     "theme": "Tema",
     "localeEs": "Español",
@@ -35,19 +52,42 @@
     "themeLight": "Claro",
     "themeDark": "Oscuro",
     "saveError": "No se pudieron guardar las preferencias.",
-    "saved": "Preferencias guardadas."
+    "saved": "Preferencias guardadas.",
+    "sectionAppearance": "Apariencia",
+    "sectionWorkspace": "Workspace",
+    "sectionNotifications": "Notificaciones",
+    "workspaceName": "Nombre del workspace",
+    "timezone": "Zona horaria",
+    "emailDigest": "Resumen por email",
+    "productUpdates": "Novedades de producto",
+    "securityAlerts": "Alertas de seguridad",
+    "comingSoon": "Solo UI — persistencia parcial vía theme/locale."
   },
   "users": {
     "title": "Usuarios",
     "create": "Crear usuario",
+    "edit": "Editar usuario",
+    "list": "Listado",
     "name": "Nombre",
     "email": "Correo",
     "password": "Contraseña",
     "role": "Rol",
     "actions": "Acciones",
     "deactivate": "Desactivar",
-    "edit": "Editar",
     "save": "Guardar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "search": "Buscar por nombre o email…",
+    "empty": "No hay usuarios para mostrar.",
+    "page": "Página",
+    "of": "de",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "passwordHint": "Dejar vacío para no cambiar (solo edición)."
+  },
+  "profile": {
+    "title": "Perfil",
+    "description": "Actualizá tu información personal.",
+    "saved": "Perfil actualizado.",
+    "saveError": "No se pudo actualizar el perfil."
   }
 }

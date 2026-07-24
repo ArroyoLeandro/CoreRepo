@@ -9,45 +9,45 @@
 */
 
 :root {
-  /* Forest mint starter palette (example) */
-  --palette-0: #051f20;
-  --palette-1: #0b2b26;
-  --palette-2: #163832;
-  --palette-3: #235347;
-  --palette-4: #8eb69b;
-  --palette-5: #daf1de;
+  /* Editable brand palette — Paprika / Carbon set */
+  --palette-0: #252422; /* Carbon Black */
+  --palette-1: #403d39; /* Charcoal Brown */
+  --palette-2: #ccc5b9; /* Silver */
+  --palette-3: #fffcf2; /* Floral White */
+  --palette-4: #eb5e28; /* Spicy Paprika */
+  --palette-5: #f7f3ea; /* Soft wash between white & silver */
 
   --radius-none: 0;
   --radius-sm: 2px;
-  --noise-opacity: 0.045;
+  --noise-opacity: 0.04;
 }
 
 [data-theme="light"],
 :root:not([data-theme="dark"]) {
-  --canvas: var(--palette-5);
-  --surface: color-mix(in srgb, var(--palette-5) 55%, white);
+  --canvas: var(--palette-3);
+  --surface: color-mix(in srgb, var(--palette-3) 88%, var(--palette-2));
   --surface-elevated: #ffffff;
   --foreground: var(--palette-0);
-  --muted: var(--palette-3);
-  --accent: var(--palette-3);
-  --accent-fg: var(--palette-5);
-  --line: color-mix(in srgb, var(--palette-4) 65%, var(--palette-3));
-  --danger: #9b2c2c;
-  --header-search: color-mix(in srgb, white 80%, var(--palette-5));
+  --muted: var(--palette-1);
+  --accent: var(--palette-4);
+  --accent-fg: #ffffff;
+  --line: color-mix(in srgb, var(--palette-2) 80%, var(--palette-1));
+  --danger: #b42318;
+  --header-search: color-mix(in srgb, white 70%, var(--palette-3));
   color-scheme: light;
 }
 
 [data-theme="dark"] {
   --canvas: var(--palette-0);
-  --surface: var(--palette-1);
-  --surface-elevated: var(--palette-2);
-  --foreground: var(--palette-5);
-  --muted: var(--palette-4);
+  --surface: color-mix(in srgb, var(--palette-0) 70%, var(--palette-1));
+  --surface-elevated: var(--palette-1);
+  --foreground: var(--palette-3);
+  --muted: var(--palette-2);
   --accent: var(--palette-4);
-  --accent-fg: var(--palette-0);
-  --line: var(--palette-2);
+  --accent-fg: #ffffff;
+  --line: color-mix(in srgb, var(--palette-1) 75%, var(--palette-2));
   --danger: #f97066;
-  --header-search: var(--palette-1);
+  --header-search: color-mix(in srgb, var(--palette-0) 60%, var(--palette-1));
   color-scheme: dark;
 }
 

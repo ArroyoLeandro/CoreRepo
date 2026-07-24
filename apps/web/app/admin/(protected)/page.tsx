@@ -1,9 +1,18 @@
-import { Activity, Languages, Palette, Users } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  CircleDollarSign,
+  Percent,
+  ShoppingBag,
+  Users,
+} from "lucide-react";
 import { cookies } from "next/headers";
-import { DataTable } from "../../../components/dashboard/DataTable";
 import { MetricCard } from "../../../components/dashboard/MetricCard";
 import { createServerApi } from "../../../lib/api";
 import { getMessages, resolveLocale } from "../../../lib/i18n";
+
+const salesBars = [42, 58, 36, 72, 64, 88, 54, 76, 61, 93, 70, 48];
+const trafficPoints = [20, 35, 28, 48, 40, 62, 55, 70, 66, 82, 74, 90];
 
 export default async function AdminHomePage() {
   const cookieStore = await cookies();
@@ -13,7 +22,6 @@ export default async function AdminHomePage() {
     .join("; ");
 
   let locale = resolveLocale(process.env.NEXT_PUBLIC_DEFAULT_LOCALE);
-  let theme: "light" | "dark" = "light";
   let userCount = "—";
 
   try {
@@ -23,63 +31,159 @@ export default async function AdminHomePage() {
       api.listUsers(),
     ]);
     locale = resolveLocale(settings.locale);
-    theme = settings.theme;
     userCount = String(users.users.length);
   } catch {
-    /* layout already gates auth */
+    /* layout gates auth */
   }
 
   const t = getMessages(locale);
+  const maxBar = Math.max(...salesBars);
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-5">
-      <header>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
-          Overview
-        </p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
-          {t.dashboard.title}
-        </h1>
-        <p className="mt-1 text-sm text-muted">{t.dashboard.subtitle}</p>
+    <div className="mx-auto flex max-w-6xl flex-col gap-3">
+      <header className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+            Overview
+          </p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            {t.dashboard.title}
+          </h1>
+          <p className="text-sm text-muted">{t.dashboard.subtitle}</p>
+        </div>
+        <span className="inline-flex items-center gap-1 border border-line bg-surface-elevated px-2 py-1 text-xs text-muted">
+          <ArrowUpRight className="size-3.5 text-accent" strokeWidth={1.75} />
+          +12.4% vs last month
+        </span>
       </header>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
         <MetricCard
           label={t.dashboard.metrics.users}
           value={userCount}
-          hint="Active directory"
+          hint="+8 this week"
           icon={Users}
         />
         <MetricCard
-          label={t.dashboard.metrics.sessions}
-          value="—"
-          hint="Template placeholder"
-          icon={Activity}
+          label={t.dashboard.metrics.revenue}
+          value="$24.8k"
+          hint="+4.1% MoM"
+          icon={CircleDollarSign}
         />
         <MetricCard
-          label={t.dashboard.metrics.locale}
-          value={locale.toUpperCase()}
-          hint="From settings"
-          icon={Languages}
+          label={t.dashboard.metrics.orders}
+          value="1,284"
+          hint="92 pending"
+          icon={ShoppingBag}
         />
         <MetricCard
-          label={t.dashboard.metrics.theme}
-          value={theme}
-          hint="From settings"
-          icon={Palette}
+          label={t.dashboard.metrics.conversion}
+          value="3.8%"
+          hint="-0.2 pts"
+          icon={Percent}
         />
       </div>
 
-      <DataTable
-        title={t.dashboard.tableTitle}
-        emptyLabel={t.dashboard.tableEmpty}
-        columns={[
-          { key: "name", label: "Name" },
-          { key: "date", label: "Date" },
-          { key: "status", label: "Status" },
-          { key: "amount", label: "Amount" },
-        ]}
-      />
+      <div className="grid grid-cols-1 gap-2 lg:grid-cols-5">
+        <section className="border border-line bg-surface-elevated p-3 lg:col-span-3">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+              {t.dashboard.chartSales}
+            </h2>
+            <span className="inline-flex items-center gap-1 text-xs text-muted">
+              <ArrowUpRight className="size-3 text-accent" />
+              healthy
+            </span>
+          </div>
+          <div className="flex h-40 items-end gap-1.5">
+            {salesBars.map((value, index) => (
+              <div
+                key={`bar-${index}`}
+                className="flex-1 bg-accent/80"
+                style={{ height: `${(value / maxBar) * 100}%` }}
+                title={`${value}`}
+              />
+            ))}
+          </div>
+        </section>
+
+        <section className="border border-line bg-surface-elevated p-3 lg:col-span-2">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+              {t.dashboard.chartTraffic}
+            </h2>
+            <span className="inline-flex items-center gap-1 text-xs text-muted">
+              <ArrowDownRight className="size-3" />
+              stable
+            </span>
+          </div>
+          <svg viewBox="0 0 240 120" className="h-40 w-full" aria-hidden>
+            <polyline
+              fill="none"
+              stroke="var(--accent)"
+              strokeWidth="2"
+              points={trafficPoints
+                .map((y, i) => {
+                  const x = (i / (trafficPoints.length - 1)) * 240;
+                  const yy = 110 - (y / 100) * 100;
+                  return `${x},${yy}`;
+                })
+                .join(" ")}
+            />
+            <polyline
+              fill="color-mix(in srgb, var(--accent) 18%, transparent)"
+              stroke="none"
+              points={`0,120 ${trafficPoints
+                .map((y, i) => {
+                  const x = (i / (trafficPoints.length - 1)) * 240;
+                  const yy = 110 - (y / 100) * 100;
+                  return `${x},${yy}`;
+                })
+                .join(" ")} 240,120`}
+            />
+          </svg>
+        </section>
+      </div>
+
+      <section className="border border-line bg-surface-elevated">
+        <div className="flex items-center justify-between border-b border-line px-3 py-2">
+          <h2 className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+            {t.dashboard.tableTitle}
+          </h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+            <thead>
+              <tr className="border-b border-line bg-surface">
+                {["Order", "Customer", "Status", "Total"].map((label) => (
+                  <th
+                    key={label}
+                    className="px-3 py-2 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted"
+                  >
+                    {label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["#1042", "Ada L.", "Paid", "$128.00"],
+                ["#1041", "Alan T.", "Pending", "$64.50"],
+                ["#1040", "Grace H.", "Refunded", "$42.00"],
+                ["#1039", "Edsger D.", "Paid", "$210.00"],
+              ].map((row) => (
+                <tr key={row[0]} className="border-b border-line last:border-b-0">
+                  {row.map((cell) => (
+                    <td key={cell} className="px-3 py-2 text-foreground">
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,8 +1,10 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { Button, Field, TextInput } from "../../../../components/ui/form-controls";
+import { MoreHorizontal, Search } from "lucide-react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 import { createBrowserApi } from "../../../../lib/api";
+import type { Messages } from "../../../../lib/i18n";
 
 type UserRow = Awaited<
   ReturnType<ReturnType<typeof createBrowserApi>["listUsers"]>
@@ -10,27 +12,36 @@ type UserRow = Awaited<
 
 type Props = {
   initialUsers: UserRow[];
-  labels: {
-    title: string;
-    create: string;
-    name: string;
-    email: string;
-    password: string;
-    role: string;
-    actions: string;
-    deactivate: string;
-    edit: string;
-    save: string;
-    cancel: string;
-  };
+  labels: Messages["users"];
 };
+
+const PAGE_SIZE = 8;
 
 export function UsersClient({ initialUsers, labels }: Props) {
   const [users, setUsers] = useState(initialUsers);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState("");
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return users;
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(q) ||
+        user.email.toLowerCase().includes(q) ||
+        user.role.toLowerCase().includes(q),
+    );
+  }, [users, query]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const pageRows = filtered.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
 
   async function refresh() {
     const api = createBrowserApi();
@@ -38,46 +49,10 @@ export function UsersClient({ initialUsers, labels }: Props) {
     setUsers(list.users);
   }
 
-  async function onCreate(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError(null);
-    setPending(true);
-    const form = new FormData(event.currentTarget);
-    try {
-      const api = createBrowserApi();
-      await api.createUser({
-        email: String(form.get("email") ?? ""),
-        password: String(form.get("password") ?? ""),
-        name: String(form.get("name") ?? ""),
-        role: (String(form.get("role") ?? "user") as "admin" | "user") || "user",
-      });
-      event.currentTarget.reset();
-      await refresh();
-    } catch {
-      setError("Could not create user.");
-    } finally {
-      setPending(false);
-    }
-  }
-
-  async function onUpdate(id: string) {
-    setError(null);
-    setPending(true);
-    try {
-      const api = createBrowserApi();
-      await api.updateUser(id, { name: editName });
-      setEditingId(null);
-      await refresh();
-    } catch {
-      setError("Could not update user.");
-    } finally {
-      setPending(false);
-    }
-  }
-
   async function onDeactivate(id: string) {
     setError(null);
     setPending(true);
+    setOpenMenuId(null);
     try {
       const api = createBrowserApi();
       await api.deleteUser(id);
@@ -90,51 +65,48 @@ export function UsersClient({ initialUsers, labels }: Props) {
   }
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-5">
-      <header>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
-          Directory
-        </p>
-        <h1
-          className="mt-1 text-2xl font-semibold tracking-tight text-foreground"
-          data-testid="users-title"
+    <div className="mx-auto flex max-w-5xl flex-col gap-3">
+      <header className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+            Directory
+          </p>
+          <h1
+            className="text-xl font-semibold tracking-tight text-foreground"
+            data-testid="users-title"
+          >
+            {labels.title}
+          </h1>
+        </div>
+        <Link
+          href="/admin/users/new"
+          className="inline-flex h-9 items-center bg-accent px-3 text-sm font-medium text-accent-fg"
         >
-          {labels.title}
-        </h1>
+          {labels.create}
+        </Link>
       </header>
 
-      <form
-        onSubmit={onCreate}
-        className="grid grid-cols-1 gap-3 border border-line bg-surface-elevated p-4 md:grid-cols-2"
-      >
-        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted md:col-span-2">
-          {labels.create}
+      <div className="flex flex-wrap items-center gap-2 border border-line bg-surface-elevated p-2">
+        <label className="relative min-w-[220px] flex-1">
+          <span className="sr-only">{labels.search}</span>
+          <Search
+            className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted"
+            strokeWidth={1.75}
+          />
+          <input
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setPage(1);
+            }}
+            placeholder={labels.search}
+            className="h-9 w-full border border-line bg-canvas pr-2 pl-8 text-sm outline-none focus:border-accent"
+          />
+        </label>
+        <p className="px-1 text-xs text-muted">
+          {filtered.length} / {users.length}
         </p>
-        <Field label={labels.name}>
-          <TextInput name="name" required />
-        </Field>
-        <Field label={labels.email}>
-          <TextInput name="email" type="email" required />
-        </Field>
-        <Field label={labels.password}>
-          <TextInput name="password" type="password" required minLength={8} />
-        </Field>
-        <Field label={labels.role}>
-          <select
-            name="role"
-            defaultValue="user"
-            className="h-10 w-full border border-line bg-surface px-3 text-sm text-foreground outline-none focus:border-accent"
-          >
-            <option value="user">user</option>
-            <option value="admin">admin</option>
-          </select>
-        </Field>
-        <div className="md:col-span-2">
-          <Button type="submit" disabled={pending}>
-            {labels.create}
-          </Button>
-        </div>
-      </form>
+      </div>
 
       {error ? <p className="text-sm text-danger">{error}</p> : null}
 
@@ -147,7 +119,7 @@ export function UsersClient({ initialUsers, labels }: Props) {
                   (label) => (
                     <th
                       key={label}
-                      className="px-4 py-3 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted"
+                      className="px-3 py-2 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted"
                     >
                       {label}
                     </th>
@@ -156,69 +128,90 @@ export function UsersClient({ initialUsers, labels }: Props) {
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <tr key={user.id} className="border-b border-line last:border-b-0">
-                  <td className="px-4 py-3 text-foreground">
-                    {editingId === user.id ? (
-                      <TextInput
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                      />
-                    ) : (
-                      user.name
-                    )}
+              {pageRows.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="px-3 py-8 text-center text-sm text-muted"
+                  >
+                    {labels.empty}
                   </td>
-                  <td className="px-4 py-3 text-muted">{user.email}</td>
-                  <td className="px-4 py-3 font-mono text-xs uppercase tracking-wide text-muted">
-                    {user.role}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-2">
-                      {editingId === user.id ? (
-                        <>
-                          <Button
-                            type="button"
-                            disabled={pending}
-                            onClick={() => void onUpdate(user.id)}
-                          >
-                            {labels.save}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={() => setEditingId(null)}
-                          >
-                            {labels.cancel}
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={() => {
-                              setEditingId(user.id);
-                              setEditName(user.name);
-                            }}
+                </tr>
+              ) : (
+                pageRows.map((user) => (
+                  <tr
+                    key={user.id}
+                    className="border-b border-line last:border-b-0"
+                  >
+                    <td className="px-3 py-2 font-medium text-foreground">
+                      {user.name}
+                    </td>
+                    <td className="px-3 py-2 text-muted">{user.email}</td>
+                    <td className="px-3 py-2 font-mono text-xs uppercase tracking-wide text-muted">
+                      {user.role}
+                    </td>
+                    <td className="relative px-3 py-2">
+                      <button
+                        type="button"
+                        className="inline-flex size-8 items-center justify-center border border-line text-muted hover:bg-surface hover:text-foreground"
+                        aria-label={labels.actions}
+                        disabled={pending}
+                        onClick={() =>
+                          setOpenMenuId((id) =>
+                            id === user.id ? null : user.id,
+                          )
+                        }
+                      >
+                        <MoreHorizontal className="size-4" strokeWidth={1.75} />
+                      </button>
+                      {openMenuId === user.id ? (
+                        <div className="absolute top-10 right-3 z-20 min-w-[140px] border border-line bg-surface-elevated shadow-sm">
+                          <Link
+                            href={`/admin/users/${user.id}`}
+                            className="block px-3 py-2 text-sm hover:bg-surface"
+                            onClick={() => setOpenMenuId(null)}
                           >
                             {labels.edit}
-                          </Button>
-                          <Button
+                          </Link>
+                          <button
                             type="button"
-                            variant="ghost"
-                            disabled={pending}
+                            className="block w-full px-3 py-2 text-left text-sm text-danger hover:bg-surface"
                             onClick={() => void onDeactivate(user.id)}
                           >
                             {labels.deactivate}
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                          </button>
+                        </div>
+                      ) : null}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
+        </div>
+
+        <div className="flex items-center justify-between border-t border-line px-3 py-2">
+          <p className="text-xs text-muted">
+            {labels.page} {safePage} {labels.of} {pageCount}
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              className="h-8 border border-line px-3 text-xs disabled:opacity-40"
+              disabled={safePage <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              {labels.prev}
+            </button>
+            <button
+              type="button"
+              className="h-8 border border-line px-3 text-xs disabled:opacity-40"
+              disabled={safePage >= pageCount}
+              onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+            >
+              {labels.next}
+            </button>
+          </div>
         </div>
       </section>
     </div>

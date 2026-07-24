@@ -21,12 +21,16 @@ export default async function AdminProtectedLayout({
 
   let locale = resolveLocale(process.env.NEXT_PUBLIC_DEFAULT_LOCALE);
   let theme: "light" | "dark" = "light";
-  let user = { name: "Admin", email: "admin@example.com" };
+  let user = {
+    id: "00000000-0000-0000-0000-000000000000",
+    name: "Admin",
+    email: "admin@example.com",
+  };
 
   try {
     const api = createServerApi(cookieHeader);
     const me = await api.me();
-    user = { name: me.name, email: me.email };
+    user = { id: me.id, name: me.name, email: me.email };
     const settings = await api.getSettings();
     locale = resolveLocale(settings.locale);
     theme = settings.theme;
@@ -42,16 +46,43 @@ export default async function AdminProtectedLayout({
       user={user}
       theme={theme}
       locale={locale}
-      breadcrumbs={[t.header.pages, t.nav.dashboard]}
       searchPlaceholder={t.header.search}
       sidebarLabels={{
         general: t.nav.general,
         dashboard: t.nav.dashboard,
         users: t.nav.users,
+        usersList: t.nav.usersList,
+        usersCreate: t.nav.usersCreate,
         settings: t.nav.settings,
         account: t.nav.account,
+        profile: t.nav.profile,
         logout: t.nav.logout,
       }}
+      crumbLabels={t.crumbs}
+      notificationLabels={{
+        title: t.header.notifications,
+        empty: t.header.notificationsEmpty,
+        markAll: t.header.markAllRead,
+      }}
+      notifications={[
+        {
+          id: "1",
+          title: "Nuevo usuario registrado",
+          time: "hace 12 min",
+          unread: true,
+        },
+        {
+          id: "2",
+          title: "Backup nocturno completado",
+          time: "hace 2 h",
+          unread: true,
+        },
+        {
+          id: "3",
+          title: "Recordatorio: revisar settings de tema",
+          time: "ayer",
+        },
+      ]}
     >
       {children}
     </DashboardLayout>
