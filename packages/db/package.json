@@ -18,9 +18,11 @@
     "check-types": "tsc --noEmit",
     "generate": "drizzle-kit generate",
     "migrate": "node --env-file=../../.env ./node_modules/tsx/dist/cli.mjs src/migrate.ts",
+    "seed": "node --env-file=../../.env ./node_modules/tsx/dist/cli.mjs src/seed.ts",
     "studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "argon2": "^0.45.1",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.44.2",
     "postgres": "^3.4.7"
