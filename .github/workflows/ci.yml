@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: corerepo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d corerepo"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/corerepo
+      JWT_ACCESS_SECRET: ci-access-secret-min-32-chars-long!!
+      JWT_REFRESH_SECRET: ci-refresh-secret-min-32-chars-long!
+      JWT_ACCESS_TTL: 15m
+      JWT_REFRESH_TTL: 7d
+      COOKIE_SECURE: "false"
+      PORT: "4000"
+      CORS_ORIGIN: http://localhost:3000
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      NEXT_PUBLIC_DEFAULT_LOCALE: es
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prepare root .env for package scripts
+        run: cp .env.example .env
+
+      - name: Build packages
+        run: pnpm turbo run build --filter=@repo/validators --filter=@repo/api-client --filter=@repo/db --filter=api
+
+      - name: Migrate database
+        run: pnpm db:migrate
+
+      - name: Run API Jest
+        run: pnpm --filter api test
+
+      - name: Check web types
+        run: pnpm --filter web check-types
