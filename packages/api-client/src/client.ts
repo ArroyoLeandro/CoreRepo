@@ -157,6 +157,14 @@ export function createApiClient(options: ApiClientOptions) {
       return UsersList.parse(await parseJson(response));
     },
 
+    async getUser(id: string): Promise<UserDto> {
+      const response = await request(`/users/${id}`);
+      if (!response.ok) {
+        throw new Error(`Get user failed with status ${response.status}`);
+      }
+      return User.parse(await parseJson(response));
+    },
+
     async createUser(body: CreateUserBodyDto): Promise<UserDto> {
       const payload = CreateUserBody.parse(body);
       const response = await request("/users", {

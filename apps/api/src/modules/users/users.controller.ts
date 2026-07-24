@@ -31,6 +31,13 @@ export class UsersController {
     return this.usersService.list();
   }
 
+  @Get(':id')
+  async getById(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<User> {
+    return this.usersService.getById(id);
+  }
+
   @Post()
   @UseGuards(CsrfGuard)
   async create(

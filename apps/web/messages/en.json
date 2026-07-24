@@ -1,33 +1,93 @@
 {
-  "brand": "CoreRepo Admin",
+  "brand": "CoreRepo",
   "nav": {
+    "general": "General",
+    "dashboard": "Dashboard",
     "users": "Users",
+    "usersList": "List",
+    "usersCreate": "Create",
     "settings": "Settings",
-    "login": "Login"
+    "account": "Account",
+    "profile": "Profile",
+    "login": "Sign in",
+    "logout": "Log out"
+  },
+  "header": {
+    "search": "Search…",
+    "pages": "Admin",
+    "notifications": "Notifications",
+    "notificationsEmpty": "No notifications",
+    "markAllRead": "Mark all read"
+  },
+  "crumbs": {
+    "admin": "Admin",
+    "/admin": "Dashboard",
+    "/admin/users": "Users",
+    "/admin/users/new": "Create user",
+    "/admin/settings": "Settings",
+    "/admin/profile": "Profile",
+    "editUser": "Edit"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Operational overview for the template.",
+    "metrics": {
+      "users": "Users",
+      "revenue": "Revenue",
+      "orders": "Orders",
+      "conversion": "Conversion"
+    },
+    "chartSales": "Sales (30 days)",
+    "chartTraffic": "Traffic",
+    "tableTitle": "Latest orders",
+    "tableEmpty": "No rows yet — table ready for data."
   },
   "settings": {
     "title": "Settings",
-    "description": "Language and theme preferences. Changes are saved on the server.",
-    "locale": "Locale",
+    "description": "Workspace, appearance, and notification preferences.",
+    "locale": "Language",
     "theme": "Theme",
     "localeEs": "Español",
     "localeEn": "English",
     "themeLight": "Light",
     "themeDark": "Dark",
     "saveError": "Could not save preferences.",
-    "saved": "Preferences saved."
+    "saved": "Preferences saved.",
+    "sectionAppearance": "Appearance",
+    "sectionWorkspace": "Workspace",
+    "sectionNotifications": "Notifications",
+    "workspaceName": "Workspace name",
+    "timezone": "Timezone",
+    "emailDigest": "Email digest",
+    "productUpdates": "Product updates",
+    "securityAlerts": "Security alerts",
+    "comingSoon": "UI only — theme/locale persist via API."
   },
   "users": {
     "title": "Users",
     "create": "Create user",
+    "edit": "Edit user",
+    "list": "List",
     "name": "Name",
     "email": "Email",
     "password": "Password",
     "role": "Role",
     "actions": "Actions",
     "deactivate": "Deactivate",
-    "edit": "Edit",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "search": "Search by name or email…",
+    "empty": "No users to show.",
+    "page": "Page",
+    "of": "of",
+    "prev": "Previous",
+    "next": "Next",
+    "passwordHint": "Leave blank to keep current password (edit only)."
+  },
+  "profile": {
+    "title": "Profile",
+    "description": "Update your personal information.",
+    "saved": "Profile updated.",
+    "saveError": "Could not update profile."
   }
 }

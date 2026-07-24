@@ -33,6 +33,22 @@ export class UsersService {
     return { users: rows };
   }
 
+  async getById(id: string): Promise<User> {
+    const row = await this.db.query.users.findFirst({
+      where: and(eq(users.id, id), isNull(users.deletedAt)),
+      columns: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
+    });
+    if (!row) {
+      throw new NotFoundException('User not found');
+    }
+    return row;
+  }
+
   async create(body: CreateUserBody): Promise<User> {
     const existing = await this.db.query.users.findFirst({
       where: eq(users.email, body.email.toLowerCase()),
