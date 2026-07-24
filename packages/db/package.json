@@ -17,10 +17,11 @@
     "dev": "tsup --watch",
     "check-types": "tsc --noEmit",
     "generate": "drizzle-kit generate",
-    "migrate": "tsx src/migrate.ts",
+    "migrate": "node --env-file=../../.env ./node_modules/tsx/dist/cli.mjs src/migrate.ts",
     "studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "drizzle-orm": "^0.44.2",
     "postgres": "^3.4.7"
   },

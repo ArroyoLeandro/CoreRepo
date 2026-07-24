@@ -1,7 +1,10 @@
+import { config as loadEnv } from "dotenv";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import postgres from "postgres";
+
+loadEnv({ path: resolve(__dirname, "../../../.env") });
 
 async function main() {
   const connectionString = process.env.DATABASE_URL;

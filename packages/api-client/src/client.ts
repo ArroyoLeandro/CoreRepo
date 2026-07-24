@@ -1,21 +1,31 @@
 import {
+  CreateUserBody,
   ForgotPasswordBody,
   HealthResponse,
   LoginBody,
   RegisterBody,
   ResetPasswordBody,
+  Settings,
+  UpdateUserBody,
   User,
+  UsersList,
+  type CreateUserBody as CreateUserBodyDto,
   type ForgotPasswordBody as ForgotPasswordBodyDto,
   type HealthResponse as HealthResponseDto,
   type LoginBody as LoginBodyDto,
   type RegisterBody as RegisterBodyDto,
   type ResetPasswordBody as ResetPasswordBodyDto,
+  type Settings as SettingsDto,
+  type UpdateUserBody as UpdateUserBodyDto,
   type User as UserDto,
+  type UsersList as UsersListDto,
 } from "@repo/validators";
 import { csrfHeaders } from "./csrf";
 
 export type ApiClientOptions = {
   baseUrl: string;
+  /** Optional cookie header for server-side calls (SSR gate). */
+  cookie?: string;
 };
 
 async function parseJson(response: Response): Promise<unknown> {
@@ -30,8 +40,11 @@ export function createApiClient(options: ApiClientOptions) {
     init: RequestInit & { csrf?: boolean } = {},
   ): Promise<Response> {
     const headers = new Headers(init.headers);
+    if (options.cookie) {
+      headers.set("Cookie", options.cookie);
+    }
     if (init.csrf) {
-      const csrf = csrfHeaders();
+      const csrf = csrfHeaders(options.cookie);
       for (const [key, value] of Object.entries(csrf)) {
         headers.set(key, value);
       }
@@ -132,6 +145,58 @@ export function createApiClient(options: ApiClientOptions) {
           `Reset password failed with status ${response.status}`,
         );
       }
+    },
+
+    async listUsers(): Promise<UsersListDto> {
+      const response = await request("/users");
+      if (!response.ok) {
+        throw new Error(`List users failed with status ${response.status}`);
+      }
+      return UsersList.parse(await parseJson(response));
+    },
+
+    async createUser(body: CreateUserBodyDto): Promise<UserDto> {
+      const payload = CreateUserBody.parse(body);
+      const response = await request("/users", {
+        method: "POST",
+        csrf: true,
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        throw new Error(`Create user failed with status ${response.status}`);
+      }
+      return User.parse(await parseJson(response));
+    },
+
+    async updateUser(id: string, body: UpdateUserBodyDto): Promise<UserDto> {
+      const payload = UpdateUserBody.parse(body);
+      const response = await request(`/users/${id}`, {
+        method: "PATCH",
+        csrf: true,
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        throw new Error(`Update user failed with status ${response.status}`);
+      }
+      return User.parse(await parseJson(response));
+    },
+
+    async deleteUser(id: string): Promise<void> {
+      const response = await request(`/users/${id}`, {
+        method: "DELETE",
+        csrf: true,
+      });
+      if (!response.ok) {
+        throw new Error(`Delete user failed with status ${response.status}`);
+      }
+    },
+
+    async getSettings(): Promise<SettingsDto> {
+      const response = await request("/settings");
+      if (!response.ok) {
+        throw new Error(`Get settings failed with status ${response.status}`);
+      }
+      return Settings.parse(await parseJson(response));
     },
   };
 }
