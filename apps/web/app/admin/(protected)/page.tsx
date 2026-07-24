@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { cookies } from "next/headers";
 import { MetricCard } from "../../../components/dashboard/MetricCard";
+import { PageShell } from "../../../components/dashboard/PageShell";
 import { createServerApi } from "../../../lib/api";
 import { getMessages, resolveLocale } from "../../../lib/i18n";
 
@@ -40,23 +41,18 @@ export default async function AdminHomePage() {
   const maxBar = Math.max(...salesBars);
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-3">
-      <header className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
-            Overview
-          </p>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            {t.dashboard.title}
-          </h1>
-          <p className="text-sm text-muted">{t.dashboard.subtitle}</p>
-        </div>
+    <PageShell
+      eyebrow="Overview"
+      title={t.dashboard.title}
+      description={t.dashboard.subtitle}
+      actions={
         <span className="inline-flex items-center gap-1 border border-line bg-surface-elevated px-2 py-1 text-xs text-muted">
           <ArrowUpRight className="size-3.5 text-accent" strokeWidth={1.75} />
           +12.4% vs last month
         </span>
-      </header>
-
+      }
+      innerClassName="flex flex-col gap-3"
+    >
       <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
         <MetricCard
           label={t.dashboard.metrics.users}
@@ -85,7 +81,7 @@ export default async function AdminHomePage() {
       </div>
 
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-5">
-        <section className="border border-line bg-surface-elevated p-3 lg:col-span-3">
+        <section className="border border-line bg-surface p-3 lg:col-span-3">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
               {t.dashboard.chartSales}
@@ -107,7 +103,7 @@ export default async function AdminHomePage() {
           </div>
         </section>
 
-        <section className="border border-line bg-surface-elevated p-3 lg:col-span-2">
+        <section className="border border-line bg-surface p-3 lg:col-span-2">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
               {t.dashboard.chartTraffic}
@@ -145,7 +141,7 @@ export default async function AdminHomePage() {
         </section>
       </div>
 
-      <section className="border border-line bg-surface-elevated">
+      <section className="mt-auto border border-line bg-surface">
         <div className="flex items-center justify-between border-b border-line px-3 py-2">
           <h2 className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
             {t.dashboard.tableTitle}
@@ -154,7 +150,7 @@ export default async function AdminHomePage() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px] border-collapse text-left text-sm">
             <thead>
-              <tr className="border-b border-line bg-surface">
+              <tr className="border-b border-line bg-surface-elevated">
                 {["Order", "Customer", "Status", "Total"].map((label) => (
                   <th
                     key={label}
@@ -184,6 +180,6 @@ export default async function AdminHomePage() {
           </table>
         </div>
       </section>
-    </div>
+    </PageShell>
   );
 }

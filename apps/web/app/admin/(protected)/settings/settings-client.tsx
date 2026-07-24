@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { PageShell } from "../../../../components/dashboard/PageShell";
 import { createBrowserApi } from "../../../../lib/api";
 import type { Messages } from "../../../../lib/i18n";
 
@@ -75,121 +76,124 @@ export function SettingsClient({ initialSettings, messages }: Props) {
   }
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-3">
-      <header>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
-          Preferences
-        </p>
-        <h1
-          className="text-xl font-semibold tracking-tight text-foreground"
-          data-testid="settings-title"
-        >
-          {messages.title}
-        </h1>
-        <p className="text-sm text-muted">{messages.description}</p>
-      </header>
-
-      <section className="border border-line bg-surface-elevated p-3">
-        <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
-          {messages.sectionAppearance}
-        </h2>
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-sm text-muted">{messages.locale}</span>
-            <div className="flex gap-2" role="group" aria-label={messages.locale}>
-              <button
-                type="button"
-                className={toggleClass(settings.locale === "es")}
-                disabled={pending || settings.locale === "es"}
-                data-testid="locale-es"
-                onClick={() => void persist({ locale: "es" })}
+    <PageShell
+      eyebrow="Preferences"
+      title={messages.title}
+      titleTestId="settings-title"
+      description={messages.description}
+      innerClassName="flex flex-col gap-3"
+    >
+      <div className="grid gap-3 lg:grid-cols-2">
+        <section className="border border-line bg-surface p-3">
+          <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+            {messages.sectionAppearance}
+          </h2>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-sm text-muted">{messages.locale}</span>
+              <div
+                className="flex gap-2"
+                role="group"
+                aria-label={messages.locale}
               >
-                {messages.localeEs}
-              </button>
-              <button
-                type="button"
-                className={toggleClass(settings.locale === "en")}
-                disabled={pending || settings.locale === "en"}
-                data-testid="locale-en"
-                onClick={() => void persist({ locale: "en" })}
-              >
-                {messages.localeEn}
-              </button>
+                <button
+                  type="button"
+                  className={toggleClass(settings.locale === "es")}
+                  disabled={pending || settings.locale === "es"}
+                  data-testid="locale-es"
+                  onClick={() => void persist({ locale: "es" })}
+                >
+                  {messages.localeEs}
+                </button>
+                <button
+                  type="button"
+                  className={toggleClass(settings.locale === "en")}
+                  disabled={pending || settings.locale === "en"}
+                  data-testid="locale-en"
+                  onClick={() => void persist({ locale: "en" })}
+                >
+                  {messages.localeEn}
+                </button>
+              </div>
+              <span data-testid="settings-locale" className="sr-only">
+                {settings.locale}
+              </span>
             </div>
-            <span data-testid="settings-locale" className="sr-only">
-              {settings.locale}
-            </span>
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-sm text-muted">{messages.theme}</span>
-            <div className="flex gap-2" role="group" aria-label={messages.theme}>
-              <button
-                type="button"
-                className={toggleClass(settings.theme === "light")}
-                disabled={pending || settings.theme === "light"}
-                data-testid="theme-light"
-                onClick={() => void persist({ theme: "light" })}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-sm text-muted">{messages.theme}</span>
+              <div
+                className="flex gap-2"
+                role="group"
+                aria-label={messages.theme}
               >
-                {messages.themeLight}
-              </button>
-              <button
-                type="button"
-                className={toggleClass(settings.theme === "dark")}
-                disabled={pending || settings.theme === "dark"}
-                data-testid="theme-dark"
-                onClick={() => void persist({ theme: "dark" })}
-              >
-                {messages.themeDark}
-              </button>
+                <button
+                  type="button"
+                  className={toggleClass(settings.theme === "light")}
+                  disabled={pending || settings.theme === "light"}
+                  data-testid="theme-light"
+                  onClick={() => void persist({ theme: "light" })}
+                >
+                  {messages.themeLight}
+                </button>
+                <button
+                  type="button"
+                  className={toggleClass(settings.theme === "dark")}
+                  disabled={pending || settings.theme === "dark"}
+                  data-testid="theme-dark"
+                  onClick={() => void persist({ theme: "dark" })}
+                >
+                  {messages.themeDark}
+                </button>
+              </div>
+              <span data-testid="settings-theme" className="sr-only">
+                {settings.theme}
+              </span>
             </div>
-            <span data-testid="settings-theme" className="sr-only">
-              {settings.theme}
-            </span>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="border border-line bg-surface-elevated p-3">
-        <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
-          {messages.sectionWorkspace}
-        </h2>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
-              {messages.workspaceName}
-            </span>
-            <input
-              value={workspaceName}
-              onChange={(e) => setWorkspaceName(e.target.value)}
-              className="h-9 border border-line bg-surface px-3 outline-none focus:border-accent"
-            />
-          </label>
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
-              {messages.timezone}
-            </span>
-            <select
-              value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
-              className="h-9 border border-line bg-surface px-3 outline-none focus:border-accent"
-            >
-              <option value="America/Argentina/Buenos_Aires">
-                America/Argentina/Buenos_Aires
-              </option>
-              <option value="UTC">UTC</option>
-              <option value="America/New_York">America/New_York</option>
-              <option value="Europe/Madrid">Europe/Madrid</option>
-            </select>
-          </label>
-        </div>
-        <p className="mt-2 text-xs text-muted">{messages.comingSoon}</p>
-      </section>
+        <section className="border border-line bg-surface p-3">
+          <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+            {messages.sectionWorkspace}
+          </h2>
+          <div className="grid grid-cols-1 gap-3">
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                {messages.workspaceName}
+              </span>
+              <input
+                value={workspaceName}
+                onChange={(e) => setWorkspaceName(e.target.value)}
+                className="h-9 border border-line bg-surface-elevated px-3 outline-none focus:border-accent"
+              />
+            </label>
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                {messages.timezone}
+              </span>
+              <select
+                value={timezone}
+                onChange={(e) => setTimezone(e.target.value)}
+                className="h-9 border border-line bg-surface-elevated px-3 outline-none focus:border-accent"
+              >
+                <option value="America/Argentina/Buenos_Aires">
+                  America/Argentina/Buenos_Aires
+                </option>
+                <option value="UTC">UTC</option>
+                <option value="America/New_York">America/New_York</option>
+                <option value="Europe/Madrid">Europe/Madrid</option>
+              </select>
+            </label>
+          </div>
+          <p className="mt-2 text-xs text-muted">{messages.comingSoon}</p>
+        </section>
+      </div>
 
-      <section className="border border-line bg-surface-elevated p-3">
+      <section className="border border-line bg-surface p-3">
         <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
           {messages.sectionNotifications}
         </h2>
-        <div className="flex flex-col gap-2">
+        <div className="grid gap-2 md:grid-cols-3">
           <CheckRow
             label={messages.emailDigest}
             checked={emailDigest}
@@ -214,6 +218,6 @@ export function SettingsClient({ initialSettings, messages }: Props) {
           {status}
         </p>
       ) : null}
-    </div>
+    </PageShell>
   );
 }

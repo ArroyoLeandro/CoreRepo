@@ -3,6 +3,7 @@
 import { MoreHorizontal, Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { PageShell } from "../../../../components/dashboard/PageShell";
 import { createBrowserApi } from "../../../../lib/api";
 import type { Messages } from "../../../../lib/i18n";
 
@@ -65,28 +66,22 @@ export function UsersClient({ initialUsers, labels }: Props) {
   }
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-3">
-      <header className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
-            Directory
-          </p>
-          <h1
-            className="text-xl font-semibold tracking-tight text-foreground"
-            data-testid="users-title"
-          >
-            {labels.title}
-          </h1>
-        </div>
+    <PageShell
+      eyebrow="Directory"
+      title={labels.title}
+      titleTestId="users-title"
+      actions={
         <Link
           href="/admin/users/new"
           className="inline-flex h-9 items-center bg-accent px-3 text-sm font-medium text-accent-fg"
         >
           {labels.create}
         </Link>
-      </header>
-
-      <div className="flex flex-wrap items-center gap-2 border border-line bg-surface-elevated p-2">
+      }
+      innerClassName="flex flex-col gap-3"
+      padded={false}
+    >
+      <div className="flex flex-wrap items-center gap-2 border-b border-line p-3">
         <label className="relative min-w-[220px] flex-1">
           <span className="sr-only">{labels.search}</span>
           <Search
@@ -108,112 +103,110 @@ export function UsersClient({ initialUsers, labels }: Props) {
         </p>
       </div>
 
-      {error ? <p className="text-sm text-danger">{error}</p> : null}
+      {error ? <p className="px-3 text-sm text-danger">{error}</p> : null}
 
-      <section className="border border-line bg-surface-elevated">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-left text-sm">
-            <thead>
-              <tr className="border-b border-line bg-surface">
-                {[labels.name, labels.email, labels.role, labels.actions].map(
-                  (label) => (
-                    <th
-                      key={label}
-                      className="px-3 py-2 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted"
-                    >
-                      {label}
-                    </th>
-                  ),
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {pageRows.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={4}
-                    className="px-3 py-8 text-center text-sm text-muted"
+      <div className="min-h-0 flex-1 overflow-x-auto">
+        <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+          <thead>
+            <tr className="border-b border-line bg-surface">
+              {[labels.name, labels.email, labels.role, labels.actions].map(
+                (label) => (
+                  <th
+                    key={label}
+                    className="px-3 py-2 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted"
                   >
-                    {labels.empty}
+                    {label}
+                  </th>
+                ),
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {pageRows.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="px-3 py-8 text-center text-sm text-muted"
+                >
+                  {labels.empty}
+                </td>
+              </tr>
+            ) : (
+              pageRows.map((user) => (
+                <tr
+                  key={user.id}
+                  className="border-b border-line last:border-b-0"
+                >
+                  <td className="px-3 py-2 font-medium text-foreground">
+                    {user.name}
+                  </td>
+                  <td className="px-3 py-2 text-muted">{user.email}</td>
+                  <td className="px-3 py-2 font-mono text-xs uppercase tracking-wide text-muted">
+                    {user.role}
+                  </td>
+                  <td className="relative px-3 py-2">
+                    <button
+                      type="button"
+                      className="inline-flex size-8 items-center justify-center border border-line text-muted hover:bg-surface hover:text-foreground"
+                      aria-label={labels.actions}
+                      disabled={pending}
+                      onClick={() =>
+                        setOpenMenuId((id) =>
+                          id === user.id ? null : user.id,
+                        )
+                      }
+                    >
+                      <MoreHorizontal className="size-4" strokeWidth={1.75} />
+                    </button>
+                    {openMenuId === user.id ? (
+                      <div className="absolute top-10 right-3 z-20 min-w-[140px] border border-line bg-surface-elevated shadow-sm">
+                        <Link
+                          href={`/admin/users/${user.id}`}
+                          className="block px-3 py-2 text-sm hover:bg-surface"
+                          onClick={() => setOpenMenuId(null)}
+                        >
+                          {labels.edit}
+                        </Link>
+                        <button
+                          type="button"
+                          className="block w-full px-3 py-2 text-left text-sm text-danger hover:bg-surface"
+                          onClick={() => void onDeactivate(user.id)}
+                        >
+                          {labels.deactivate}
+                        </button>
+                      </div>
+                    ) : null}
                   </td>
                 </tr>
-              ) : (
-                pageRows.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="border-b border-line last:border-b-0"
-                  >
-                    <td className="px-3 py-2 font-medium text-foreground">
-                      {user.name}
-                    </td>
-                    <td className="px-3 py-2 text-muted">{user.email}</td>
-                    <td className="px-3 py-2 font-mono text-xs uppercase tracking-wide text-muted">
-                      {user.role}
-                    </td>
-                    <td className="relative px-3 py-2">
-                      <button
-                        type="button"
-                        className="inline-flex size-8 items-center justify-center border border-line text-muted hover:bg-surface hover:text-foreground"
-                        aria-label={labels.actions}
-                        disabled={pending}
-                        onClick={() =>
-                          setOpenMenuId((id) =>
-                            id === user.id ? null : user.id,
-                          )
-                        }
-                      >
-                        <MoreHorizontal className="size-4" strokeWidth={1.75} />
-                      </button>
-                      {openMenuId === user.id ? (
-                        <div className="absolute top-10 right-3 z-20 min-w-[140px] border border-line bg-surface-elevated shadow-sm">
-                          <Link
-                            href={`/admin/users/${user.id}`}
-                            className="block px-3 py-2 text-sm hover:bg-surface"
-                            onClick={() => setOpenMenuId(null)}
-                          >
-                            {labels.edit}
-                          </Link>
-                          <button
-                            type="button"
-                            className="block w-full px-3 py-2 text-left text-sm text-danger hover:bg-surface"
-                            onClick={() => void onDeactivate(user.id)}
-                          >
-                            {labels.deactivate}
-                          </button>
-                        </div>
-                      ) : null}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
-        <div className="flex items-center justify-between border-t border-line px-3 py-2">
-          <p className="text-xs text-muted">
-            {labels.page} {safePage} {labels.of} {pageCount}
-          </p>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              className="h-8 border border-line px-3 text-xs disabled:opacity-40"
-              disabled={safePage <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-            >
-              {labels.prev}
-            </button>
-            <button
-              type="button"
-              className="h-8 border border-line px-3 text-xs disabled:opacity-40"
-              disabled={safePage >= pageCount}
-              onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-            >
-              {labels.next}
-            </button>
-          </div>
+      <div className="mt-auto flex items-center justify-between border-t border-line px-3 py-2">
+        <p className="text-xs text-muted">
+          {labels.page} {safePage} {labels.of} {pageCount}
+        </p>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className="h-8 border border-line px-3 text-xs disabled:opacity-40"
+            disabled={safePage <= 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+          >
+            {labels.prev}
+          </button>
+          <button
+            type="button"
+            className="h-8 border border-line px-3 text-xs disabled:opacity-40"
+            disabled={safePage >= pageCount}
+            onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+          >
+            {labels.next}
+          </button>
         </div>
-      </section>
-    </div>
+      </div>
+    </PageShell>
   );
 }

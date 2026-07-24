@@ -8,7 +8,7 @@ type Props = {
 export function MainContent({ children, className = "" }: Props) {
   return (
     <main
-      className={`min-h-0 flex-1 overflow-y-auto bg-canvas p-3 md:p-4 ${className}`}
+      className={`flex min-h-0 flex-1 flex-col overflow-hidden bg-canvas p-2 md:p-3 ${className}`}
       data-testid="admin-main"
     >
       {children}

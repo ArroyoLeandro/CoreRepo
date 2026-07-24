@@ -51,7 +51,7 @@ export function Sidebar({ brand, user, labels }: Props) {
 
   function linkClass(active: boolean, nested = false) {
     return [
-      "group relative flex items-center gap-3 py-2 text-sm transition-colors",
+      "group relative flex w-full items-center gap-3 py-2 text-sm transition-colors",
       nested ? "px-3 pl-9" : "px-3",
       active
         ? "bg-accent/15 font-semibold text-foreground"
@@ -139,7 +139,7 @@ export function Sidebar({ brand, user, labels }: Props) {
         >
           {collapsed ? "·" : labels.general}
         </p>
-        <nav className="flex flex-col gap-0.5 px-1">
+        <nav className="flex flex-col gap-0.5 px-0">
           <Link
             href="/admin"
             onClick={closeMobile}
@@ -164,25 +164,28 @@ export function Sidebar({ brand, user, labels }: Props) {
               <Users className="size-4 shrink-0" strokeWidth={1.75} />
             </Link>
           ) : (
-            <div>
+            <div className="w-full">
               <button
                 type="button"
                 className={linkClass(pathname.startsWith("/admin/users"))}
                 onClick={() => setUsersOpen((v) => !v)}
                 aria-expanded={usersOpen}
               >
+                {pathname.startsWith("/admin/users") ? (
+                  <span className="absolute inset-y-1 left-0 w-0.5 bg-accent" />
+                ) : null}
                 <Users className="size-4 shrink-0" strokeWidth={1.75} />
                 <span className="flex-1 text-left">{labels.users}</span>
                 <ChevronDown
                   className={[
-                    "size-3.5 transition-transform",
+                    "size-3.5 shrink-0 transition-transform",
                     usersOpen ? "rotate-180" : "",
                   ].join(" ")}
                   strokeWidth={1.75}
                 />
               </button>
               {usersOpen ? (
-                <div className="mt-0.5 flex flex-col">
+                <div className="mt-0.5 flex w-full flex-col">
                   <Link
                     href="/admin/users"
                     onClick={closeMobile}
@@ -217,7 +220,7 @@ export function Sidebar({ brand, user, labels }: Props) {
         >
           {collapsed ? "·" : labels.account}
         </p>
-        <nav className="flex flex-col gap-0.5 px-1">
+        <nav className="flex flex-col gap-0.5 px-0">
           <Link
             href="/admin/profile"
             onClick={closeMobile}
