@@ -1,0 +1,162 @@
+.shell {
+  --admin-bg: #f3f4f6;
+  --admin-surface: #ffffff;
+  --admin-ink: #111827;
+  --admin-muted: #4b5563;
+  --admin-line: #d1d5db;
+  --admin-accent: #0f766e;
+  --admin-danger: #b91c1c;
+  min-height: 100vh;
+  background: var(--admin-bg);
+  color: var(--admin-ink);
+  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
+}
+
+.authCard,
+.panel {
+  width: min(420px, calc(100% - 2rem));
+  margin: 3rem auto;
+  padding: 1.5rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-line);
+}
+
+.panelWide {
+  width: min(960px, calc(100% - 2rem));
+  margin: 1.5rem auto;
+  padding: 1.5rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-line);
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--admin-line);
+  background: var(--admin-surface);
+}
+
+.nav a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.brand {
+  font-weight: 700;
+  margin-right: auto;
+}
+
+.title {
+  font-size: 1.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.form label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.form input,
+.form select {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--admin-line);
+  background: #fff;
+  color: var(--admin-ink);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.button {
+  appearance: none;
+  border: 1px solid var(--admin-accent);
+  background: var(--admin-accent);
+  color: #fff;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.buttonSecondary {
+  appearance: none;
+  border: 1px solid var(--admin-line);
+  background: #fff;
+  color: var(--admin-ink);
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.buttonDanger {
+  appearance: none;
+  border: 1px solid var(--admin-danger);
+  background: #fff;
+  color: var(--admin-danger);
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.error {
+  color: var(--admin-danger);
+  font-size: 0.9rem;
+}
+
+.muted {
+  color: var(--admin-muted);
+  font-size: 0.9rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid var(--admin-line);
+  text-align: left;
+  padding: 0.55rem 0.35rem;
+  vertical-align: top;
+}
+
+.links {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.dl {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.dl div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.dl dt {
+  font-size: 0.8rem;
+  color: var(--admin-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dl dd {
+  font-size: 1.05rem;
+}
