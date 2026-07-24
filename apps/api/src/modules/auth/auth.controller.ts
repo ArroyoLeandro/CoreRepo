@@ -12,6 +12,7 @@ import {
   ForgotPasswordBody,
   LoginBody,
   RegisterBody,
+  ResetPasswordBody,
   User,
 } from '@repo/validators';
 import type { Request, Response } from 'express';
@@ -85,6 +86,15 @@ export class AuthController {
     @Body(new ZodValidationPipe(ForgotPasswordBody)) body: ForgotPasswordBody,
   ): Promise<{ ok: true }> {
     await this.authService.forgotPassword(body);
+    return { ok: true };
+  }
+
+  @Post('reset-password')
+  @HttpCode(200)
+  async resetPassword(
+    @Body(new ZodValidationPipe(ResetPasswordBody)) body: ResetPasswordBody,
+  ): Promise<{ ok: true }> {
+    await this.authService.resetPassword(body);
     return { ok: true };
   }
 }

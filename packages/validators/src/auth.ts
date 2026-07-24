@@ -21,6 +21,13 @@ export const ForgotPasswordBody = z.object({
 
 export type ForgotPasswordBody = z.infer<typeof ForgotPasswordBody>;
 
+export const ResetPasswordBody = z.object({
+  token: z.string().min(1),
+  password: z.string().min(8),
+});
+
+export type ResetPasswordBody = z.infer<typeof ResetPasswordBody>;
+
 export const User = z.object({
   id: z.string().uuid(),
   email: z.string().email(),

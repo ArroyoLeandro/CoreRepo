@@ -131,6 +131,44 @@ describe('Auth contract', () => {
     expect(sent[0].text.length).toBeGreaterThan(0);
   });
 
+  it('reset-password consumes token and allows login with new password', async () => {
+    const email = `reset-${randomUUID()}@example.com`;
+    const password = 'Str0ngPass!';
+    const nextPassword = 'N3wStr0ngPass!';
+
+    await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({ email, password, name: 'Reset User' })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .post('/auth/forgot-password')
+      .send({ email })
+      .expect(200);
+
+    const tokenMatch = sent[0].text.match(/([a-f0-9]{64})/i);
+    expect(tokenMatch).not.toBeNull();
+    const token = tokenMatch![1];
+
+    await request(app.getHttpServer())
+      .post('/auth/reset-password')
+      .send({ token, password: nextPassword })
+      .expect(200);
+
+    await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ email, password })
+      .expect((res) => {
+        expect(res.status).toBeGreaterThanOrEqual(400);
+        expect(res.status).toBeLessThan(500);
+      });
+
+    await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ email, password: nextPassword })
+      .expect(200);
+  });
+
   it('rejects mutating auth routes without matching CSRF header', async () => {
     const email = `csrf-${randomUUID()}@example.com`;
     const password = 'Str0ngPass!';

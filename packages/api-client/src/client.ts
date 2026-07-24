@@ -3,11 +3,13 @@ import {
   HealthResponse,
   LoginBody,
   RegisterBody,
+  ResetPasswordBody,
   User,
   type ForgotPasswordBody as ForgotPasswordBodyDto,
   type HealthResponse as HealthResponseDto,
   type LoginBody as LoginBodyDto,
   type RegisterBody as RegisterBodyDto,
+  type ResetPasswordBody as ResetPasswordBodyDto,
   type User as UserDto,
 } from "@repo/validators";
 import { csrfHeaders } from "./csrf";
@@ -115,6 +117,19 @@ export function createApiClient(options: ApiClientOptions) {
       if (!response.ok) {
         throw new Error(
           `Forgot password failed with status ${response.status}`,
+        );
+      }
+    },
+
+    async resetPassword(body: ResetPasswordBodyDto): Promise<void> {
+      const payload = ResetPasswordBody.parse(body);
+      const response = await request("/auth/reset-password", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        throw new Error(
+          `Reset password failed with status ${response.status}`,
         );
       }
     },

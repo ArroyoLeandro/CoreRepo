@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Inject,
   Injectable,
@@ -14,11 +15,12 @@ import type {
   ForgotPasswordBody,
   LoginBody,
   RegisterBody,
+  ResetPasswordBody,
   User,
 } from '@repo/validators';
 import * as argon2 from 'argon2';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, gt, isNull } from 'drizzle-orm';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 import { DATABASE } from '../../db/db.module';
 import { EMAIL_PORT, type EmailPort } from '../email/email.port';
@@ -241,6 +243,47 @@ export class AuthService {
       subject: 'Password reset',
       text: `Use this reset token to reset your password: ${rawToken}`,
     });
+  }
+
+  async resetPassword(body: ResetPasswordBody): Promise<void> {
+    const tokenHash = hashToken(body.token);
+    const now = new Date();
+
+    const resetToken = await this.db.query.passwordResetTokens.findFirst({
+      where: and(
+        eq(passwordResetTokens.tokenHash, tokenHash),
+        isNull(passwordResetTokens.usedAt),
+        gt(passwordResetTokens.expiresAt, now),
+      ),
+    });
+
+    if (!resetToken) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    const passwordHash = await argon2.hash(body.password, {
+      type: argon2.argon2id,
+    });
+
+    await this.db
+      .update(users)
+      .set({ passwordHash, updatedAt: now })
+      .where(eq(users.id, resetToken.userId));
+
+    await this.db
+      .update(passwordResetTokens)
+      .set({ usedAt: now })
+      .where(eq(passwordResetTokens.id, resetToken.id));
+
+    await this.db
+      .update(refreshSessions)
+      .set({ revokedAt: now })
+      .where(
+        and(
+          eq(refreshSessions.userId, resetToken.userId),
+          isNull(refreshSessions.revokedAt),
+        ),
+      );
   }
 
   private async issueSession(user: User): Promise<IssuedTokens> {
