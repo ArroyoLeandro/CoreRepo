@@ -1,5 +1,5 @@
-import en from "../messages/en.json";
-import es from "../messages/es.json";
+import en from "../../messages/en.json";
+import es from "../../messages/es.json";
 
 export type Locale = "es" | "en";
 export type Messages = typeof es;

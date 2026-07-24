@@ -1,51 +1,24 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { PageShell } from "../../../../components/dashboard/PageShell";
-import { Button, Field, TextInput } from "../../../../components/ui/form-controls";
-import { createBrowserApi } from "../../../../lib/api";
-import type { Messages } from "../../../../lib/i18n";
-
-type User = Awaited<ReturnType<ReturnType<typeof createBrowserApi>["me"]>>;
+import type { Messages } from "@/shared/lib/i18n";
+import { PageShell } from "@/shared/layout/page-shell";
+import { Button, Field, TextInput } from "@/shared/ui/form-controls";
+import {
+  useProfileForm,
+  type ProfileUser,
+} from "../hooks/use-profile-form";
 
 type Props = {
-  initialUser: User;
+  initialUser: ProfileUser;
   labels: Messages["profile"];
   fieldLabels: Messages["users"];
 };
 
-export function ProfileClient({ initialUser, labels, fieldLabels }: Props) {
-  const [user, setUser] = useState(initialUser);
-  const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
-
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError(null);
-    setStatus(null);
-    setPending(true);
-    const form = new FormData(event.currentTarget);
-    const name = String(form.get("name") ?? "");
-    const email = String(form.get("email") ?? "");
-    const password = String(form.get("password") ?? "");
-
-    try {
-      const api = createBrowserApi();
-      const patch: { name?: string; email?: string; password?: string } = {
-        name,
-        email,
-      };
-      if (password.trim()) patch.password = password;
-      const updated = await api.updateUser(user.id, patch);
-      setUser(updated);
-      setStatus(labels.saved);
-    } catch {
-      setError(labels.saveError);
-    } finally {
-      setPending(false);
-    }
-  }
+export function ProfileForm({ initialUser, labels, fieldLabels }: Props) {
+  const { user, error, status, pending, submit } = useProfileForm(
+    initialUser,
+    labels,
+  );
 
   return (
     <PageShell
@@ -56,7 +29,7 @@ export function ProfileClient({ initialUser, labels, fieldLabels }: Props) {
     >
       <div className="grid min-h-full lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)]">
         <form
-          onSubmit={onSubmit}
+          onSubmit={submit}
           className="flex flex-col gap-3 border-b border-line p-4 lg:border-r lg:border-b-0"
         >
           <div className="grid gap-3 sm:grid-cols-2">

@@ -1,19 +1,15 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { DashboardLayout } from "../../../components/dashboard/DashboardLayout";
-import { createServerApi } from "../../../lib/api";
-import { getMessages, resolveLocale } from "../../../lib/i18n";
+import { DashboardLayout } from "@/shared/layout";
+import { createServerApi } from "@/shared/lib/api";
+import { getMessages, resolveLocale } from "@/shared/lib/i18n";
+import { getRequestCookieHeader } from "@/shared/lib/request-cookies";
 
 export default async function AdminProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((entry) => `${entry.name}=${entry.value}`)
-    .join("; ");
+  const cookieHeader = await getRequestCookieHeader();
 
   if (!cookieHeader.includes("access_token=")) {
     redirect("/admin/login");

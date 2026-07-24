@@ -1,21 +1,17 @@
-import { cookies } from "next/headers";
-import { createServerApi } from "../../../../lib/api";
-import { getMessages, resolveLocale } from "../../../../lib/i18n";
-import { SettingsClient } from "./settings-client";
+import { SettingsPanel } from "@/features/settings";
+import { createServerApi } from "@/shared/lib/api";
+import { getMessages, resolveLocale } from "@/shared/lib/i18n";
+import { getRequestCookieHeader } from "@/shared/lib/request-cookies";
 
 export default async function AdminSettingsPage() {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((entry) => `${entry.name}=${entry.value}`)
-    .join("; ");
-
-  const api = createServerApi(cookieHeader);
+  const api = createServerApi(await getRequestCookieHeader());
   const settings = await api.getSettings();
-  const locale = resolveLocale(settings.locale);
-  const messages = getMessages(locale);
+  const messages = getMessages(resolveLocale(settings.locale));
 
   return (
-    <SettingsClient initialSettings={settings} messages={messages.settings} />
+    <SettingsPanel
+      initialSettings={settings}
+      messages={messages.settings}
+    />
   );
 }
