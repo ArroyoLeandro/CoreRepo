@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { appSettings, type Database } from '@repo/db';
-import { DEFAULT_SETTINGS, Settings } from '@repo/validators';
+import {
+  DEFAULT_SETTINGS,
+  Settings,
+  type UpdateSettingsBody,
+} from '@repo/validators';
 import { eq } from 'drizzle-orm';
 import { DATABASE } from '../../db/db.module';
 
@@ -25,5 +29,30 @@ export class SettingsService {
     }
 
     return parsed.data;
+  }
+
+  async update(body: UpdateSettingsBody): Promise<Settings> {
+    const current = await this.get();
+    const next: Settings = {
+      locale: body.locale ?? current.locale,
+      theme: body.theme ?? current.theme,
+    };
+
+    await this.db
+      .insert(appSettings)
+      .values({
+        key: SETTINGS_KEY,
+        value: next,
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: appSettings.key,
+        set: {
+          value: next,
+          updatedAt: new Date(),
+        },
+      });
+
+    return next;
   }
 }
