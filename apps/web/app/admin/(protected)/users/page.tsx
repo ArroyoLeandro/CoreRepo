@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { createServerApi } from "../../../../lib/api";
+import { getMessages, resolveLocale } from "../../../../lib/i18n";
 import { UsersClient } from "./users-client";
 
 export default async function AdminUsersPage() {
@@ -10,7 +11,11 @@ export default async function AdminUsersPage() {
     .join("; ");
 
   const api = createServerApi(cookieHeader);
-  const list = await api.listUsers();
+  const [list, settings] = await Promise.all([
+    api.listUsers(),
+    api.getSettings(),
+  ]);
+  const t = getMessages(resolveLocale(settings.locale));
 
-  return <UsersClient initialUsers={list.users} />;
+  return <UsersClient initialUsers={list.users} labels={t.users} />;
 }

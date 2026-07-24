@@ -1,9 +1,29 @@
 {
-  "brand": "CoreRepo Admin",
+  "brand": "CoreRepo",
   "nav": {
+    "general": "General",
+    "dashboard": "Dashboard",
     "users": "Usuarios",
     "settings": "Configuración",
-    "login": "Iniciar sesión"
+    "account": "Cuenta",
+    "login": "Iniciar sesión",
+    "logout": "Salir"
+  },
+  "header": {
+    "search": "Buscar…",
+    "pages": "Pages"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Resumen del template admin.",
+    "metrics": {
+      "users": "Usuarios",
+      "sessions": "Sesiones",
+      "locale": "Idioma",
+      "theme": "Tema"
+    },
+    "tableTitle": "Actividad reciente",
+    "tableEmpty": "Sin filas todavía — espacio listo para datos."
   },
   "settings": {
     "title": "Configuración",

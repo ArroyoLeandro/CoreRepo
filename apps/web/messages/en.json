@@ -1,14 +1,34 @@
 {
-  "brand": "CoreRepo Admin",
+  "brand": "CoreRepo",
   "nav": {
+    "general": "General",
+    "dashboard": "Dashboard",
     "users": "Users",
     "settings": "Settings",
-    "login": "Login"
+    "account": "Account",
+    "login": "Sign in",
+    "logout": "Log out"
+  },
+  "header": {
+    "search": "Search…",
+    "pages": "Pages"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Admin template overview.",
+    "metrics": {
+      "users": "Users",
+      "sessions": "Sessions",
+      "locale": "Locale",
+      "theme": "Theme"
+    },
+    "tableTitle": "Recent activity",
+    "tableEmpty": "No rows yet — table ready for data."
   },
   "settings": {
     "title": "Settings",
     "description": "Language and theme preferences. Changes are saved on the server.",
-    "locale": "Locale",
+    "locale": "Language",
     "theme": "Theme",
     "localeEs": "Español",
     "localeEn": "English",

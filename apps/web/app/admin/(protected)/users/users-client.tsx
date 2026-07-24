@@ -1,8 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { Button, Field, TextInput } from "../../../../components/ui/form-controls";
 import { createBrowserApi } from "../../../../lib/api";
-import styles from "../../admin.module.css";
 
 type UserRow = Awaited<
   ReturnType<ReturnType<typeof createBrowserApi>["listUsers"]>
@@ -10,9 +10,22 @@ type UserRow = Awaited<
 
 type Props = {
   initialUsers: UserRow[];
+  labels: {
+    title: string;
+    create: string;
+    name: string;
+    email: string;
+    password: string;
+    role: string;
+    actions: string;
+    deactivate: string;
+    edit: string;
+    save: string;
+    cancel: string;
+  };
 };
 
-export function UsersClient({ initialUsers }: Props) {
+export function UsersClient({ initialUsers, labels }: Props) {
   const [users, setUsers] = useState(initialUsers);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -77,111 +90,137 @@ export function UsersClient({ initialUsers }: Props) {
   }
 
   return (
-    <div className={styles.panelWide}>
-      <h1 className={styles.title}>Users</h1>
-      <p className={styles.muted}>
-        Create, update, and soft-delete (deactivate) users.
-      </p>
+    <div className="mx-auto flex max-w-5xl flex-col gap-5">
+      <header>
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+          Directory
+        </p>
+        <h1
+          className="mt-1 text-2xl font-semibold tracking-tight text-foreground"
+          data-testid="users-title"
+        >
+          {labels.title}
+        </h1>
+      </header>
 
-      <form className={styles.form} onSubmit={onCreate}>
-        <label>
-          Name
-          <input name="name" required />
-        </label>
-        <label>
-          Email
-          <input name="email" type="email" required />
-        </label>
-        <label>
-          Password
-          <input name="password" type="password" required minLength={8} />
-        </label>
-        <label>
-          Role
-          <select name="role" defaultValue="user">
+      <form
+        onSubmit={onCreate}
+        className="grid grid-cols-1 gap-3 border border-line bg-surface-elevated p-4 md:grid-cols-2"
+      >
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted md:col-span-2">
+          {labels.create}
+        </p>
+        <Field label={labels.name}>
+          <TextInput name="name" required />
+        </Field>
+        <Field label={labels.email}>
+          <TextInput name="email" type="email" required />
+        </Field>
+        <Field label={labels.password}>
+          <TextInput name="password" type="password" required minLength={8} />
+        </Field>
+        <Field label={labels.role}>
+          <select
+            name="role"
+            defaultValue="user"
+            className="h-10 w-full border border-line bg-surface px-3 text-sm text-foreground outline-none focus:border-accent"
+          >
             <option value="user">user</option>
             <option value="admin">admin</option>
           </select>
-        </label>
-        <div className={styles.actions}>
-          <button className={styles.button} type="submit" disabled={pending}>
-            Create user
-          </button>
+        </Field>
+        <div className="md:col-span-2">
+          <Button type="submit" disabled={pending}>
+            {labels.create}
+          </Button>
         </div>
       </form>
 
-      {error ? <p className={styles.error}>{error}</p> : null}
+      {error ? <p className="text-sm text-danger">{error}</p> : null}
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>
-                {editingId === user.id ? (
-                  <input
-                    value={editName}
-                    onChange={(event) => setEditName(event.target.value)}
-                  />
-                ) : (
-                  user.name
-                )}
-              </td>
-              <td>{user.email}</td>
-              <td>{user.role}</td>
-              <td>
-                <div className={styles.actions}>
-                  {editingId === user.id ? (
-                    <>
-                      <button
-                        type="button"
-                        className={styles.button}
-                        disabled={pending}
-                        onClick={() => onUpdate(user.id)}
-                      >
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.buttonSecondary}
-                        onClick={() => setEditingId(null)}
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      type="button"
-                      className={styles.buttonSecondary}
-                      onClick={() => {
-                        setEditingId(user.id);
-                        setEditName(user.name);
-                      }}
+      <section className="border border-line bg-surface-elevated">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+            <thead>
+              <tr className="border-b border-line bg-surface">
+                {[labels.name, labels.email, labels.role, labels.actions].map(
+                  (label) => (
+                    <th
+                      key={label}
+                      className="px-4 py-3 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted"
                     >
-                      Edit
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className={styles.buttonDanger}
-                    disabled={pending}
-                    onClick={() => onDeactivate(user.id)}
-                  >
-                    Deactivate
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                      {label}
+                    </th>
+                  ),
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user.id} className="border-b border-line last:border-b-0">
+                  <td className="px-4 py-3 text-foreground">
+                    {editingId === user.id ? (
+                      <TextInput
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                      />
+                    ) : (
+                      user.name
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-muted">{user.email}</td>
+                  <td className="px-4 py-3 font-mono text-xs uppercase tracking-wide text-muted">
+                    {user.role}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-2">
+                      {editingId === user.id ? (
+                        <>
+                          <Button
+                            type="button"
+                            disabled={pending}
+                            onClick={() => void onUpdate(user.id)}
+                          >
+                            {labels.save}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => setEditingId(null)}
+                          >
+                            {labels.cancel}
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => {
+                              setEditingId(user.id);
+                              setEditName(user.name);
+                            }}
+                          >
+                            {labels.edit}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            disabled={pending}
+                            onClick={() => void onDeactivate(user.id)}
+                          >
+                            {labels.deactivate}
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   );
 }
