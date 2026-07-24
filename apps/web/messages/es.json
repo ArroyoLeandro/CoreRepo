@@ -1,0 +1,33 @@
+{
+  "brand": "CoreRepo Admin",
+  "nav": {
+    "users": "Usuarios",
+    "settings": "Configuración",
+    "login": "Iniciar sesión"
+  },
+  "settings": {
+    "title": "Configuración",
+    "description": "Preferencias de idioma y tema. Los cambios se guardan en el servidor.",
+    "locale": "Idioma",
+    "theme": "Tema",
+    "localeEs": "Español",
+    "localeEn": "English",
+    "themeLight": "Claro",
+    "themeDark": "Oscuro",
+    "saveError": "No se pudieron guardar las preferencias.",
+    "saved": "Preferencias guardadas."
+  },
+  "users": {
+    "title": "Usuarios",
+    "create": "Crear usuario",
+    "name": "Nombre",
+    "email": "Correo",
+    "password": "Contraseña",
+    "role": "Rol",
+    "actions": "Acciones",
+    "deactivate": "Desactivar",
+    "edit": "Editar",
+    "save": "Guardar",
+    "cancel": "Cancelar"
+  }
+}

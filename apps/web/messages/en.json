@@ -1,0 +1,33 @@
+{
+  "brand": "CoreRepo Admin",
+  "nav": {
+    "users": "Users",
+    "settings": "Settings",
+    "login": "Login"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Language and theme preferences. Changes are saved on the server.",
+    "locale": "Locale",
+    "theme": "Theme",
+    "localeEs": "Español",
+    "localeEn": "English",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "saveError": "Could not save preferences.",
+    "saved": "Preferences saved."
+  },
+  "users": {
+    "title": "Users",
+    "create": "Create user",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "role": "Role",
+    "actions": "Actions",
+    "deactivate": "Deactivate",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel"
+  }
+}

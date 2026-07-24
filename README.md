@@ -1,159 +1,79 @@
-# Turborepo starter
+# CoreRepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+Fullstack monorepo template: **Next.js** (`apps/web`) + **NestJS** (`apps/api`) with shared Zod contracts, Drizzle/Postgres, and cookie JWT auth. Use it as a **GitHub template** (or clone) and ship an admin console on day one.
 
-## Using this example
+## Quick path
 
-Run the following command:
+1. Create a repo from this GitHub template (or `git clone`), then `pnpm install`
+2. `cp .env.example .env` — set secrets; keep `SEED_ADMIN_PASSWORD` for the demo admin
+3. `docker compose up -d` → `pnpm db:migrate` → `pnpm db:seed`
+4. `pnpm turbo dev` → web **3000**, api **4000**, health `http://localhost:4000/health`, admin `http://localhost:3000/admin/login`
 
-```sh
-npx create-turbo@latest
-```
+## Apps and packages
 
-## What's inside?
+| Path | Role |
+| --- | --- |
+| `apps/web` | Next.js UI + `/admin/*` (port **3000**) |
+| `apps/api` | NestJS API (port **4000**); boots with `node --env-file=../../.env` |
+| `packages/validators` | Zod SSOT (tsup dual CJS/ESM) |
+| `packages/api-client` | Typed `fetch` (`credentials: 'include'`) |
+| `packages/db` | Drizzle schema, migrate, seed |
+| `packages/ui` | Shared UI stubs |
 
-This Turborepo includes the following packages/apps:
+## Environment
 
-### Apps and Packages
+Copy `.env.example` → `.env` at the **repo root** (API and db scripts read it from there).
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+| Variable | Default / note | Used by |
+| --- | --- | --- |
+| `PORT` | `4000` | API listen |
+| `CORS_ORIGIN` | `http://localhost:3000` | API CORS |
+| `DATABASE_URL` | local Postgres | API + Drizzle |
+| `JWT_*` / `COOKIE_SECURE` | see example | Auth cookies |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:4000` | Web → API |
+| `NEXT_PUBLIC_DEFAULT_LOCALE` | `es` | Admin chrome default |
+| `SEED_ADMIN_PASSWORD` | **required for seed** | `pnpm db:seed` |
+| `SEED_ADMIN_EMAIL` | `admin@example.com` | Seed admin |
+| `SEED_ADMIN_NAME` | `Admin` | Seed admin |
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
-```
-
-Without global `turbo`, use your package manager:
+## Docker, migrate, seed
 
 ```sh
-cd my-turborepo
-npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
+docker compose up -d          # Postgres on localhost:5432
+pnpm db:migrate               # drizzle migrations
+pnpm db:seed                  # admin user + default locale/theme settings
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Seed upserts an `admin` role user and `app_settings` defaults (`locale: es`, `theme: light`). Login at `/admin/login` with the seeded email/password.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+## Dev and verify
 
 ```sh
-turbo build --filter=docs
+pnpm turbo build --filter=@repo/validators --filter=@repo/api-client --filter=@repo/db
+pnpm turbo dev                # web:3000 + api:4000
+pnpm --filter api test        # Jest (needs Postgres + DATABASE_URL)
+pnpm --filter web check-types
 ```
 
-Without global `turbo`:
+- Web: http://localhost:3000  
+- Admin: http://localhost:3000/admin/login  
+- API health: http://localhost:4000/health  
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+If `:4000` refuses connections, the API likely crashed — usually missing `DATABASE_URL` or Postgres down.
 
-### Develop
+## CI
 
-To develop all apps and packages, run the following command:
+GitHub Actions (`.github/workflows/ci.yml`) runs on push/PR: `pnpm install`, build packages + api, migrate against a Postgres service container, `pnpm --filter api test`, and `pnpm --filter web check-types`.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+## GitHub template checklist
 
-```sh
-cd my-turborepo
-turbo dev
-```
+- [ ] Use **Use this template** (no nested `apps/api/.git`)
+- [ ] Copy `.env.example` → `.env` and rotate JWT + seed password
+- [ ] Start compose, migrate, seed, then `pnpm turbo dev`
+- [ ] Confirm health on `:4000/health` and admin login on `:3000`
 
-Without global `turbo`, use your package manager:
+## Notes
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+- Nest build outputs (`dist/**`) are covered in `turbo.json`.
+- Shared packages use tsup dual packages so Nest (CJS) and Next (ESM) both resolve.
+- Root helpers: `pnpm db:migrate`, `pnpm db:seed`.
