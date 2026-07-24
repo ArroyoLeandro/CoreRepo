@@ -6,6 +6,7 @@ import {
   RegisterBody,
   ResetPasswordBody,
   Settings,
+  UpdateSettingsBody,
   UpdateUserBody,
   User,
   UsersList,
@@ -16,6 +17,7 @@ import {
   type RegisterBody as RegisterBodyDto,
   type ResetPasswordBody as ResetPasswordBodyDto,
   type Settings as SettingsDto,
+  type UpdateSettingsBody as UpdateSettingsBodyDto,
   type UpdateUserBody as UpdateUserBodyDto,
   type User as UserDto,
   type UsersList as UsersListDto,
@@ -195,6 +197,19 @@ export function createApiClient(options: ApiClientOptions) {
       const response = await request("/settings");
       if (!response.ok) {
         throw new Error(`Get settings failed with status ${response.status}`);
+      }
+      return Settings.parse(await parseJson(response));
+    },
+
+    async updateSettings(body: UpdateSettingsBodyDto): Promise<SettingsDto> {
+      const payload = UpdateSettingsBody.parse(body);
+      const response = await request("/settings", {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+        csrf: true,
+      });
+      if (!response.ok) {
+        throw new Error(`Update settings failed with status ${response.status}`);
       }
       return Settings.parse(await parseJson(response));
     },

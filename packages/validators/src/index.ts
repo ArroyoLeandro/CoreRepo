@@ -23,5 +23,8 @@ export type {
   UsersList as UsersListType,
 } from "./users";
 
-export { DEFAULT_SETTINGS, Settings } from "./settings";
-export type { Settings as SettingsType } from "./settings";
+export { DEFAULT_SETTINGS, Settings, UpdateSettingsBody } from "./settings";
+export type {
+  Settings as SettingsType,
+  UpdateSettingsBody as UpdateSettingsBodyType,
+} from "./settings";
